@@ -1,0 +1,48 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class DeleteDatabaseExample {
+
+    // Database configurations
+    // Replace with your database URL, username, and password
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/your_database_name";
+    private static final String DB_USER = "root";
+    private static final String DB_PASSWORD = "your_password";
+
+    public static void main(String[] args) {
+        // SQL query with a placeholder (?) for the ID to prevent SQL injection
+        String deleteSQL = "DELETE FROM employees WHERE employee_id = ?";
+
+        // Value of the record we want to delete
+        int targetEmployeeId = 101;
+
+        System.out.println("Connecting to the database...");
+
+        // Try-with-resources ensures resources are automatically closed
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+
+            System.out.println("Database connection established successfully!");
+
+            // Bind the employee ID value to the first placeholder (?) in the query
+            preparedStatement.setInt(1, targetEmployeeId);
+
+            // Execute the deletion
+            // executeUpdate() is used for DELETE, INSERT, and UPDATE queries
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            // Verify if any rows were deleted
+            if (rowsAffected > 0) {
+                System.out.println("Success! Deleted " + rowsAffected + " row(s) matching ID: " + targetEmployeeId);
+            } else {
+                System.out.println("No record found with ID: " + targetEmployeeId + ". No rows were deleted.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Database error occurred!");
+            e.printStackTrace();
+        }
+    }
+}
